@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using SGStask.Models;
 using System.Globalization;
-using System.Net;
 using System.Text.RegularExpressions;
 
 namespace SGStask.Services
@@ -12,7 +11,6 @@ namespace SGStask.Services
         private readonly int _updateDelay = 1800000; //12 hours in milliseconds
         private readonly int _storeTime = 1; // 1 day
         private readonly string _requestUrl = "https://www.cbr-xml-daily.ru/daily_json.js";
-        private readonly string _pattern = "(\"[A-Z]{3}\":\\s)";
         private readonly IMemoryCache _memoryCache;
         public CurrencyUpdateService(IMemoryCache memoryCache)
         {
@@ -31,7 +29,7 @@ namespace SGStask.Services
                     var httpResponseMessage = await client.GetAsync(_requestUrl);
                     string jsonResponce = await httpResponseMessage.Content.ReadAsStringAsync();
 
-                    string jsonResult = Regex.Replace(jsonResponce, _pattern, "");
+                    string jsonResult = Regex.Replace(jsonResponce, "(\"[A-Z]{3}\":\\s)", "");
                     jsonResult = Regex.Replace(jsonResult, "(\"Valute\":\\s*){([\\s\\S]*)}\\n", "$1[$2]");
 
                     var currencies = JsonConvert.DeserializeObject<Root>(jsonResult);
