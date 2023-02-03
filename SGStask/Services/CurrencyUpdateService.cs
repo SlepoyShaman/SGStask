@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using SGStask.Models;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace SGStask.Services
 {
@@ -12,6 +11,7 @@ namespace SGStask.Services
         private readonly int _storeTime = 1; // 1 day
         private readonly string _requestUrl = "https://www.cbr-xml-daily.ru/daily_json.js";
         private readonly IMemoryCache _memoryCache;
+        
         public CurrencyUpdateService(IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
@@ -29,10 +29,7 @@ namespace SGStask.Services
                     var httpResponseMessage = await client.GetAsync(_requestUrl);
                     string jsonResponce = await httpResponseMessage.Content.ReadAsStringAsync();
 
-                    string jsonResult = Regex.Replace(jsonResponce, "(\"[A-Z]{3}\":\\s)", "");
-                    jsonResult = Regex.Replace(jsonResult, "(\"Valute\":\\s*){([\\s\\S]*)}\\n", "$1[$2]");
-
-                    var currencies = JsonConvert.DeserializeObject<Root>(jsonResult);
+                    var currencies = JsonConvert.DeserializeObject<Root>(jsonResponce);
 
                     _memoryCache.Set(MemoryCacheKeys.CurrencyKey, currencies, TimeSpan.FromDays(_storeTime));
                 }

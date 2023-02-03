@@ -38,7 +38,7 @@ namespace SGStask.Controllers
         {
             try
             {
-                var result = TryGetAllCurrencies().Valute.FirstOrDefault(v => v.ID == id);
+                var result = TryGetAllCurrencies().Valute.Values.FirstOrDefault(v => v.ID == id);
 
                 if (result == null)
                     return BadRequest(new { Error = "Данные по валюте не найдены." });
